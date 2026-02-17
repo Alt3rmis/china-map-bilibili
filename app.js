@@ -3,9 +3,38 @@ let chart = null;
 let currentMap = 'china'; // 当前地图: 'china' 或省份名
 let isLoading = false; // 加载状态
 
+// 检测是否是开发环境
+function isDevMode() {
+    // 检查 URL 参数 ?debug=1
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('debug') === '1') {
+        return true;
+    }
+
+    // 检查本地地址
+    const hostname = window.location.hostname;
+    const localHostnames = ['localhost', '127.0.0.1', '0.0.0.0'];
+    if (localHostnames.includes(hostname)) {
+        return true;
+    }
+
+    // 检查内网 IP
+    const ipPattern = /^(10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|192\.168\.)/;
+    if (ipPattern.test(hostname)) {
+        return true;
+    }
+
+    return false;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     loadMapData();
     setupEventListeners();
+
+    // 如果是开发环境，创建调试面板
+    if (isDevMode()) {
+        createDebugPanel();
+    }
 });
 
 // 初始化时检查数据
@@ -214,7 +243,7 @@ function initMap(mapName = 'china') {
                 name: '快递里的中国',
                 type: 'map',
                 map: mapName,
-                roam: false,
+                roam: isDevMode() && mapName === 'hainan' ? true : false,
                 zoom: mapName === 'china' ? 1.2 : mapName === 'hainan' ? 3.5 : 1.3,
                 center: mapName === 'hainan' ? [109.9, 19.2] : undefined,
                 emphasis: {
@@ -263,6 +292,26 @@ function initMap(mapName = 'china') {
 
     chart.clear();
     chart.setOption(option);
+
+    // 如果是开发环境且是海南地图，添加 georoam 事件监听
+    if (isDevMode() && mapName === 'hainan') {
+        // 移除旧的监听器
+        chart.off('georoam');
+
+        // 监听拖动和缩放事件
+        chart.on('georoam', function(params) {
+            const option = chart.getOption();
+            const currentZoom = option.series[0].zoom;
+            const currentCenter = option.series[0].center;
+
+            // 更新调试面板显示
+            updateDebugPanel(currentZoom, currentCenter);
+        });
+
+        // 初始化调试面板显示
+        const initialOption = chart.getOption();
+        updateDebugPanel(initialOption.series[0].zoom, initialOption.series[0].center);
+    }
 
     // 更新返回按钮显示状态
     const backBtn = document.getElementById('back-btn');
@@ -582,4 +631,98 @@ function getVideosForCity(cityName) {
 
     // 按发布时间排序（最新的在前）
     return videos.sort((a, b) => new Date(b.date) - new Date(a.date));
+}
+
+// ====== 调试面板功能（仅在开发环境显示）======
+
+// 创建调试面板
+function createDebugPanel() {
+    // 创建调试面板容器
+    const debugPanel = document.createElement('div');
+    debugPanel.id = 'debug-panel';
+    debugPanel.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.9);
+        border: 1px solid #48dbfb;
+        border-radius: 8px;
+        padding: 15px;
+        z-index: 10000;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        min-width: 280px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    `;
+
+    debugPanel.innerHTML = `
+        <div style="color: #48dbfb; font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #48dbfb; padding-bottom: 5px;">
+            🛠️ 海南地图调试面板
+        </div>
+        <div style="margin-bottom: 8px;">
+            <span style="color: #feca57;">Zoom:</span>
+            <span id="debug-zoom" style="color: #fff; margin-left: 8px;">3.5</span>
+        </div>
+        <div style="margin-bottom: 8px;">
+            <span style="color: #feca57;">Center:</span>
+            <span id="debug-center" style="color: #fff; margin-left: 8px;">[109.9, 19.2]</span>
+        </div>
+        <div style="margin-bottom: 15px;">
+            <span style="color: #feca57;">Code:</span>
+            <span id="debug-code" style="color: #48dbfb; margin-left: 8px;">zoom: 3.5, center: [109.9, 19.2]</span>
+        </div>
+        <div style="display: flex; gap: 8px;">
+            <button id="debug-zoom-in" style="flex: 1; background: #48dbfb; border: none; color: #000; padding: 6px; cursor: pointer; border-radius: 4px;">放大 +</button>
+            <button id="debug-zoom-out" style="flex: 1; background: #48dbfb; border: none; color: #000; padding: 6px; cursor: pointer; border-radius: 4px;">缩小 -</button>
+        </div>
+        <button id="debug-reset" style="width: 100%; margin-top: 8px; background: #ff6b6b; border: none; color: #fff; padding: 6px; cursor: pointer; border-radius: 4px;">重置</button>
+        <div style="margin-top: 10px; font-size: 11px; color: #888; line-height: 1.4;">
+            提示: 拖动和缩放地图，找到合适位置后，复制代码到 app.js 第 218-219 行
+        </div>
+    `;
+
+    document.body.appendChild(debugPanel);
+
+    // 绑定按钮事件
+    document.getElementById('debug-zoom-in').addEventListener('click', () => adjustZoom(0.1));
+    document.getElementById('debug-zoom-out').addEventListener('click', () => adjustZoom(-0.1));
+    document.getElementById('debug-reset').addEventListener('click', () => resetMap());
+}
+
+// 更新调试面板显示
+function updateDebugPanel(zoom, center) {
+    const zoomEl = document.getElementById('debug-zoom');
+    const centerEl = document.getElementById('debug-center');
+    const codeEl = document.getElementById('debug-code');
+
+    if (zoomEl) zoomEl.textContent = zoom.toFixed(2);
+    if (centerEl) centerEl.textContent = `[${center[0].toFixed(2)}, ${center[1].toFixed(2)}]`;
+    if (codeEl) codeEl.textContent = `zoom: ${zoom.toFixed(2)}, center: [${center[0].toFixed(2)}, ${center[1].toFixed(2)}]`;
+}
+
+// 调整缩放
+function adjustZoom(delta) {
+    if (!chart || currentMap !== '海南') return;
+
+    const option = chart.getOption();
+    const currentZoom = option.series[0].zoom;
+    const newZoom = Math.max(1, currentZoom + delta);
+
+    chart.setOption({
+        series: [{
+            zoom: newZoom
+        }]
+    });
+}
+
+// 重置地图
+function resetMap() {
+    if (!chart || currentMap !== '海南') return;
+
+    chart.setOption({
+        series: [{
+            zoom: 3.5,
+            center: [109.9, 19.2]
+        }]
+    });
 }
