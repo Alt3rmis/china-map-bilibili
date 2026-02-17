@@ -24,4 +24,10 @@ jobs:
 
       - name: Deploy to server
         run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} -p ${{ secrets.SERVER_PORT || 22 }} "cd ${{ secrets.SERVER_PATH }} && git pull origin main && echo 'Deployed at $(date)'"
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} -p ${{ secrets.SERVER_PORT || 22 }} << 'ENDSSH'
+            cd ${{ secrets.SERVER_PATH }}
+            git pull origin main
+            npm install
+            pm2 restart china-map || pm2 start server.js --name china-map
+            echo 'Deployed at $(date)'
+          ENDSSH

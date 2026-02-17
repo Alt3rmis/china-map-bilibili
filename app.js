@@ -7,12 +7,32 @@ let isLoading = false; // 加载状态
 // 投票限制：每个终端每10分钟只能投1票
 const VOTE_COOLDOWN_MINUTES = 10;
 const VOTE_STORAGE_KEY = 'voteHistory';
+const VOTE_API_URL = '/api/votes';
 
 // 当前投票终端ID（用于限流）
 let currentTerminalId = null;
 
-// 模拟投票数据（实际应该从服务器获取）
-const voteData = {};
+// 投票数据（从服务器获取）
+let voteData = {};
+
+// 从服务器加载投票数据
+async function loadVotesFromServer() {
+    try {
+        const response = await fetch(VOTE_API_URL);
+        if (response.ok) {
+            voteData = await response.json();
+            console.log('✓ 投票数据已加载:', voteData);
+        }
+    } catch (error) {
+        console.error('加载投票数据失败:', error);
+        // 如果服务器不可用，使用localStorage作为备用
+        const localVotes = localStorage.getItem('localVoteData');
+        if (localVotes) {
+            voteData = JSON.parse(localVotes);
+            console.log('✓ 使用本地缓存的投票数据');
+        }
+    }
+}
 
 // 检测是否是开发环境
 function isDevMode() {
@@ -87,6 +107,9 @@ function createDebugToggleBtn() {
 document.addEventListener('DOMContentLoaded', function() {
     loadMapData();
     setupEventListeners();
+
+    // 从服务器加载投票数据
+    loadVotesFromServer();
 
     // 如果是开发环境，创建调试面板和切换按钮
     if (isDevMode()) {
@@ -625,14 +648,14 @@ function hideVoteConfirmDialog() {
 }
 
 // 确认投票
-function confirmVote() {
+async function confirmVote() {
     const modal = document.getElementById('vote-confirm-modal');
     const cityName = modal?.dataset.city;
 
     if (!cityName) return;
 
-    // 执行投票
-    handleVote(cityName);
+    // 执行投票（等待服务器响应）
+    await handleVote(cityName);
 
     // 隐藏对话框
     hideVoteConfirmDialog();
@@ -1334,22 +1357,48 @@ function checkCanVote() {
 }
 
 // 处理投票事件
-function handleVote(province) {
+async function handleVote(province) {
     if (!checkCanVote()) {
         alert('您在 10 分钟内已经投过票了，请稍后再试');
         return;
     }
 
-    // 更新投票数据
-    if (!voteData[province]) {
-        voteData[province] = { votes: 0, description: '' };
-    }
-    voteData[province].votes += 1;
+    try {
+        // 向服务器提交投票
+        const response = await fetch('/api/vote', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ province })
+        });
 
-    // 记录全局最后投票时间
-    const voteHistory = JSON.parse(localStorage.getItem(VOTE_STORAGE_KEY) || '{}');
-    voteHistory.lastVote = new Date().toISOString();
-    localStorage.setItem(VOTE_STORAGE_KEY, JSON.stringify(voteHistory));
+        if (response.ok) {
+            const result = await response.json();
+
+            // 更新本地投票数据
+            if (!voteData[province]) {
+                voteData[province] = { votes: 0, description: '' };
+            }
+            voteData[province].votes = result.votes;
+
+            // 保存到localStorage作为备用
+            localStorage.setItem('localVoteData', JSON.stringify(voteData));
+
+            // 记录全局最后投票时间
+            const voteHistory = JSON.parse(localStorage.getItem(VOTE_STORAGE_KEY) || '{}');
+            voteHistory.lastVote = new Date().toISOString();
+            localStorage.setItem(VOTE_STORAGE_KEY, JSON.stringify(voteHistory));
+
+            console.log('✓ 投票成功:', province, '当前票数:', result.votes);
+        } else {
+            const error = await response.json();
+            alert('投票失败: ' + (error.error || '未知错误'));
+        }
+    } catch (error) {
+        console.error('投票请求失败:', error);
+        alert('网络错误，投票失败，请稍后重试');
+    }
 }
 
 // 显示排行榜面板
