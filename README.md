@@ -56,6 +56,20 @@ open index.html
    ```
 
 3. **首次手动部署**
+
+   **方式一：使用自动部署脚本（推荐）**
+   ```bash
+   # 上传 scripts/manual-deploy.sh 到服务器
+   chmod +x scripts/manual-deploy.sh
+
+   # 运行部署脚本（使用默认路径 /var/www/china-map-bilibili）
+   ./scripts/manual-deploy.sh
+
+   # 或指定自定义路径
+   ./scripts/manual-deploy.sh /path/to/your/project
+   ```
+
+   **方式二：手动部署**
    ```bash
    # 克隆代码到服务器
    cd /var/www
@@ -75,6 +89,8 @@ open index.html
    pm2 startup
    pm2 save
    ```
+
+   **故障排除：** 如果遇到问题，请查看 [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
 
 **快速开始（自动部署）：**
 
@@ -344,10 +360,13 @@ china-map-bilibili/
 │   ├── extract-cities.js        # 城市名称自动提取
 │   ├── process-raw-data.js      # 原始数据处理流水线（推荐）
 │   ├── reorganize-by-province.js # 按省份重新组织数据
+│   ├── manual-deploy.sh        # 手动部署脚本（推荐）
 │   ├── deploy.sh               # 手动部署脚本
+│   ├── check-deploy.js         # 部署环境检查脚本
 │   └── README.md              # 脚本说明文档
 ├── docs/                        # 文档
-│   └── DEPLOY.md              # 自动部署配置指南
+│   ├── DEPLOY.md              # 自动部署配置指南
+│   └── TROUBLESHOOTING.md    # 故障排除指南
 └── data/                        # 数据文件夹
     ├── raw_data.js             # 原始数据（从 B站控制台粘贴）
     ├── data.js                 # 最终数据配置（provinceData 格式）
