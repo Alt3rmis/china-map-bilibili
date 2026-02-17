@@ -1,0 +1,8 @@
+{
+  "name": "china-map-bilibili",
+  "version": "1.0.0",
+  "description": "快递里的中国 - 交互式地图",
+  "scripts": {
+    "process-data": "node scripts/process-raw-data.js"
+  }
+}

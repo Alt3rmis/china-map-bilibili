@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快递里的中国 - 城市地图</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>快递里的中国</h1>
+            <p class="subtitle">老猫鱼不吃鱼 | 城市杂谈系列</p>
+            <a href="https://space.bilibili.com/238365787/lists/475111?type=season" target="_blank" class="bilibili-link">
+                <span class="bili-icon">B</span>
+                B站合集
+            </a>
+        </header>
+
+        <div class="main-content">
+            <div class="map-container">
+                <button class="back-btn" id="back-btn" style="display: none;">
+                    <span class="back-icon">←</span>
+                    返回全国地图
+                </button>
+                <!-- Loading 遮罩层 -->
+                <div class="loading-overlay" id="loading-overlay" style="display: none;">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">加载中...</div>
+                </div>
+                <div id="china-map"></div>
+            </div>
+
+            <div class="info-panel" id="info-panel">
+                <div class="info-empty">
+                    <div class="empty-icon">🗺️</div>
+                    <p>点击地图上的城市查看视频</p>
+                </div>
+                <div class="info-content" id="info-content" style="display: none;">
+                    <button class="close-btn" id="close-btn">&times;</button>
+                    <h2 id="city-name"></h2>
+                    <div id="video-list" class="video-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>数据来源：哔哩哔哩UP主 老猫鱼不吃鱼</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="data/data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
