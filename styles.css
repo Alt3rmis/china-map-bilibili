@@ -668,6 +668,192 @@ footer {
     line-height: 1.5;
 }
 
+/* 投票界面样式 */
+.vote-ui {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.vote-ui-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.vote-ui-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #feca57;
+    margin-bottom: 12px;
+}
+
+.vote-ui-desc {
+    font-size: 1rem;
+    color: #a0a0a0;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.vote-ui-stats {
+    margin-bottom: 20px;
+}
+
+.vote-ui-count {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #48dbfb;
+}
+
+.vote-ui-btn {
+    padding: 12px 32px;
+    background: linear-gradient(135deg, #feca57, #ff9f43);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(254, 159, 67, 0.3);
+}
+
+.vote-ui-btn:hover:not(.disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(254, 159, 67, 0.4);
+}
+
+.vote-ui-btn.disabled {
+    background: rgba(255, 255, 255, 0.1);
+    color: #a0a0a0;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* 投票确认对话框 */
+.vote-confirm-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.vote-confirm-content {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.vote-confirm-icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+}
+
+.vote-confirm-content h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #feca57;
+    margin: 0 0 16px 0;
+}
+
+.vote-confirm-text {
+    font-size: 1rem;
+    color: #fff;
+    margin-bottom: 12px;
+}
+
+.vote-confirm-city {
+    font-weight: bold;
+    color: #48dbfb;
+}
+
+.vote-confirm-note {
+    font-size: 0.85rem;
+    color: #a0a0a0;
+    margin-bottom: 24px;
+}
+
+.vote-confirm-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.vote-confirm-btn {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.vote-confirm-btn.cancel {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.vote-confirm-btn.cancel:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.vote-confirm-btn.confirm {
+    background: linear-gradient(135deg, #feca57, #ff9f43);
+    color: white;
+    box-shadow: 0 4px 15px rgba(254, 159, 67, 0.3);
+}
+
+.vote-confirm-btn.confirm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(254, 159, 67, 0.4);
+}
+
 /* 响应式设计 */
 @media (max-width: 1024px) {
     .main-content {

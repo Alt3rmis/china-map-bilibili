@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>快递里的中国 - 城市地图</title>
     <link rel="icon" href="data:,">
-    <link rel="stylesheet" href="styles.css?v=9">
+    <link rel="stylesheet" href="styles.css?v=10">
 </head>
 <body>
     <div class="container">
@@ -67,6 +67,20 @@
 
                 <p class="rank-desc" id="rank-desc">统计各省份已制作地区数占总地区数的比例（不含直辖市）</p>
                 <div id="rank-list" class="rank-list"></div>
+            </div>
+        </div>
+
+        <!-- 投票确认对话框 -->
+        <div class="vote-confirm-modal" id="vote-confirm-modal" style="display: none;">
+            <div class="vote-confirm-content">
+                <div class="vote-confirm-icon">🎯</div>
+                <h3>确认投票</h3>
+                <p class="vote-confirm-text">确定要为 <span class="vote-confirm-city" id="vote-confirm-city"></span> 投票吗？</p>
+                <p class="vote-confirm-note">每个地区每 10 分钟只能投票一次</p>
+                <div class="vote-confirm-buttons">
+                    <button class="vote-confirm-btn cancel" id="vote-confirm-cancel">取消</button>
+                    <button class="vote-confirm-btn confirm" id="vote-confirm-confirm">确认投票</button>
+                </div>
             </div>
         </div>
     </div>

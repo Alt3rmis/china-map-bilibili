@@ -393,6 +393,8 @@ function initMap(mapName = 'china') {
     // 地图点击事件
     chart.off('click');
     chart.on('click', function(params) {
+        console.log('Map clicked:', { mapName, paramsName: params.name });
+
         // 如果正在加载，忽略点击
         if (isLoading) {
             return;
@@ -403,13 +405,13 @@ function initMap(mapName = 'china') {
             if (!directControlledCities.includes(params.name)) {
                 // 非直辖市可以下钻
                 loadProvinceMap(params.name);
-            } else if (params.name && citiesWithData.includes(params.name)) {
-                // 直辖市或有视频的省份
+            } else if (params.name) {
+                // 直辖市（有视频或没有视频都显示）
                 showCityInfo(params.name);
             }
         } else {
-            // 省级地图点击
-            if (params.name && citiesWithData.includes(params.name)) {
+            // 省级地图点击（有视频或没有视频都显示）
+            if (params.name) {
                 showCityInfo(params.name);
             }
         }
@@ -567,6 +569,89 @@ function setupEventListeners() {
             }
         });
     }
+
+    // 投票界面按钮（事件委托）
+    const videoList = document.getElementById('video-list');
+    if (videoList) {
+        videoList.addEventListener('click', function(e) {
+            const voteBtn = e.target.closest('.vote-ui-btn');
+            if (voteBtn && !voteBtn.classList.contains('disabled')) {
+                const cityName = voteBtn.dataset.city;
+                showVoteConfirmDialog(cityName);
+            }
+        });
+    }
+
+    // 投票确认对话框
+    const voteConfirmCancel = document.getElementById('vote-confirm-cancel');
+    const voteConfirmConfirm = document.getElementById('vote-confirm-confirm');
+    const voteConfirmModal = document.getElementById('vote-confirm-modal');
+
+    if (voteConfirmCancel) {
+        voteConfirmCancel.addEventListener('click', hideVoteConfirmDialog);
+    }
+
+    if (voteConfirmConfirm) {
+        voteConfirmConfirm.addEventListener('click', confirmVote);
+    }
+
+    if (voteConfirmModal) {
+        voteConfirmModal.addEventListener('click', function(e) {
+            if (e.target === voteConfirmModal) {
+                hideVoteConfirmDialog();
+            }
+        });
+    }
+}
+
+// 显示投票确认对话框
+function showVoteConfirmDialog(cityName) {
+    const modal = document.getElementById('vote-confirm-modal');
+    const cityNameEl = document.getElementById('vote-confirm-city');
+
+    if (modal && cityNameEl) {
+        cityNameEl.textContent = cityName;
+        modal.dataset.city = cityName;
+        modal.style.display = 'flex';
+    }
+}
+
+// 隐藏投票确认对话框
+function hideVoteConfirmDialog() {
+    const modal = document.getElementById('vote-confirm-modal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// 确认投票
+function confirmVote() {
+    const modal = document.getElementById('vote-confirm-modal');
+    const cityName = modal?.dataset.city;
+
+    if (!cityName) return;
+
+    // 执行投票
+    handleVote(cityName);
+
+    // 隐藏对话框
+    hideVoteConfirmDialog();
+
+    // 刷新投票界面（右侧面板）
+    const infoContent = document.getElementById('info-content');
+    const cityNameEl = document.getElementById('city-name');
+    const videoList = document.getElementById('video-list');
+    const infoEmpty = document.querySelector('.info-empty');
+
+    if (infoContent && cityNameEl && videoList && infoEmpty) {
+        showVoteUI(cityName, cityNameEl, videoList, infoEmpty, infoContent);
+    }
+
+    // 刷新排行榜（如果打开）
+    const rankPanel = document.getElementById('rank-panel');
+    if (rankPanel && rankPanel.style.display !== 'none') {
+        generateRankListHTML();
+    }
 }
 
 // 显示省份的所有视频
@@ -640,12 +725,17 @@ function showCityInfo(cityName) {
 
     const videos = getVideosForCity(displayName);
 
-    if (videos.length === 0) {
-        return;
-    }
+    console.log('showCityInfo called:', { cityName, displayName, videosLength: videos.length });
 
     // 更新城市名称
     cityNameEl.textContent = cityName;
+
+    if (videos.length === 0) {
+        // 没有视频，显示投票界面
+        console.log('No videos found, showing vote UI for:', cityName);
+        showVoteUI(cityName, cityNameEl, videoList, infoEmpty, infoContent);
+        return;
+    }
 
     // 清空并生成视频列表
     videoList.innerHTML = '';
@@ -697,6 +787,47 @@ function hideCityInfo() {
     }, 300);
 }
 
+// 显示投票界面
+function showVoteUI(cityName, cityNameEl, videoList, infoEmpty, infoContent) {
+    console.log('showVoteUI called for:', cityName);
+    const canVote = checkCanVote(cityName);
+    const currentVotes = voteData[cityName]?.votes || 0;
+
+    console.log('Vote info:', { canVote, currentVotes, cityName });
+
+    // 更新城市名称
+    cityNameEl.textContent = cityName;
+
+    // 清空并生成投票界面
+    videoList.innerHTML = `
+        <div class="vote-ui">
+            <div class="vote-ui-icon">🗳️</div>
+            <div class="vote-ui-title">暂无视频</div>
+            <div class="vote-ui-desc">这个地区还没有相关视频，期待UP主的后续更新吗？</div>
+            <div class="vote-ui-stats">
+                <span class="vote-ui-count">${currentVotes} 人期待</span>
+            </div>
+            <button class="vote-ui-btn ${canVote ? '' : 'disabled'}" data-city="${cityName}">
+                ${canVote ? '🎯 为TA投票' : '已投票'}
+            </button>
+        </div>
+    `;
+
+    // 显示内容
+    infoEmpty.style.display = 'none';
+    infoContent.style.display = 'block';
+
+    // 添加动画效果
+    infoContent.style.opacity = '0';
+    infoContent.style.transform = 'translateX(20px)';
+
+    setTimeout(() => {
+        infoContent.style.transition = 'all 0.3s ease';
+        infoContent.style.opacity = '1';
+        infoContent.style.transform = 'translateX(0)';
+    }, 10);
+}
+
 // 获取城市的所有视频
 function getVideosForCity(cityName) {
     const videos = [];
@@ -718,8 +849,8 @@ function getVideosForCity(cityName) {
         });
     }
 
-    // 回退到 cityData
-    if (videos.length === 0 && cityData) {
+    // 回退到 cityData（如果存在）
+    if (videos.length === 0 && typeof cityData !== 'undefined' && cityData) {
         Object.keys(cityData).forEach(key => {
             const baseName = key.replace(/市|州|区|地区|自治区|特别行政区/g, '');
             if (baseName === cityName || key === cityName) {
@@ -1221,16 +1352,6 @@ function handleVote(province) {
         timestamp: new Date().toISOString()
     };
     localStorage.setItem(VOTE_STORAGE_KEY, JSON.stringify(voteHistory));
-
-    // 重新生成排行榜
-    generateRankListHTML();
-
-    // 显示成功提示
-    const voteBtn = document.querySelector(`.vote-btn[data-province="${province}"]`);
-    if (voteBtn) {
-        voteBtn.textContent = '已投';
-        voteBtn.disabled = true;
-    }
 }
 
 // 显示排行榜面板
@@ -1275,9 +1396,10 @@ function showRankPanel() {
 
         // 添加投票按钮事件
         rankPanel.addEventListener('click', function(e) {
-            if (e.target.classList.contains('vote-btn')) {
-                const province = e.target.dataset.province;
-                handleVote(province);
+            const voteBtn = e.target.closest('.vote-btn');
+            if (voteBtn && !voteBtn.disabled) {
+                const province = voteBtn.dataset.province;
+                showVoteConfirmDialog(province);
             }
         });
     }
