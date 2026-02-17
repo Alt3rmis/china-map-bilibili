@@ -3,6 +3,17 @@ let chart = null;
 let currentMap = 'china'; // 当前地图: 'china' 或省份名
 let isLoading = false; // 加载状态
 
+// ====== 投票功能 ======
+// 投票限制：每个终端每10分钟只能投1票
+const VOTE_COOLDOWN_MINUTES = 10;
+const VOTE_STORAGE_KEY = 'voteHistory';
+
+// 当前投票终端ID（用于限流）
+let currentTerminalId = null;
+
+// 模拟投票数据（实际应该从服务器获取）
+const voteData = {};
+
 // 检测是否是开发环境
 function isDevMode() {
     // 检查 URL 参数 ?debug=1
@@ -1100,7 +1111,7 @@ function generateRankListHTML() {
                 </div>
             `;
         }).join('');
-    } else {
+    } else if (currentRankView === 'region') {
         // 按地区显示
         const results = calculateRegionCoverage();
 
@@ -1139,6 +1150,86 @@ function generateRankListHTML() {
                 </div>
             `;
         }).join('');
+    } else if (currentRankView === 'expected') {
+        // 生成最期待榜
+        const expectedItems = Object.keys(voteData).sort((a, b) => voteData[b].votes - voteData[a].votes).slice(0, 10);
+
+        if (expectedItems.length === 0) {
+            rankListEl.innerHTML = '<p style="text-align: center; color: #a0a0a0;">暂无投票数据</p>';
+            return;
+        }
+
+        rankListEl.innerHTML = expectedItems.map((item, index) => {
+            const rank = index + 1;
+            const rankClass = rank <= 3 ? `rank-${rank}` : '';
+            const itemData = voteData[item] || { votes: 0, description: '' };
+            const voteCount = itemData.votes;
+            const canVote = checkCanVote(item);
+
+            return `
+                <div class="rank-item ${rankClass} expected-rank-item">
+                    <div class="rank-number">${rank}</div>
+                    <div class="rank-content-wrapper">
+                        <div class="expected-header">
+                            <div class="rank-name">${item}</div>
+                            <div class="vote-stats">
+                                <span class="vote-count">${voteCount} 票</span>
+                                <button class="vote-btn" data-province="${item}" ${canVote ? '' : 'disabled'}>投票</button>
+                            </div>
+                        </div>
+                        ${itemData.description ? `<div class="expected-desc">${itemData.description}</div>` : ''}
+                    </div>
+                    <div class="rank-bar-bg" style="width: ${Math.min(voteCount, 100)}%"></div>
+                </div>
+            `;
+        }).join('');
+    }
+}
+
+// 检查是否可以投票（10分钟内是否已投过）
+function checkCanVote(province) {
+    const voteHistory = JSON.parse(localStorage.getItem(VOTE_STORAGE_KEY) || '{}');
+    const lastVote = voteHistory[province];
+
+    if (!lastVote) {
+        return true;
+    }
+
+    const lastVoteTime = new Date(lastVote.timestamp);
+    const now = new Date();
+    const minutesDiff = (now - lastVoteTime) / (1000 * 60);
+
+    return minutesDiff >= VOTE_COOLDOWN_MINUTES;
+}
+
+// 处理投票事件
+function handleVote(province) {
+    if (!checkCanVote(province)) {
+        alert('您在 10 分钟内已经投过票了，请稍后再试');
+        return;
+    }
+
+    // 更新投票数据
+    if (!voteData[province]) {
+        voteData[province] = { votes: 0, description: '' };
+    }
+    voteData[province].votes += 1;
+
+    // 记录投票历史
+    const voteHistory = JSON.parse(localStorage.getItem(VOTE_STORAGE_KEY) || '{}');
+    voteHistory[province] = {
+        timestamp: new Date().toISOString()
+    };
+    localStorage.setItem(VOTE_STORAGE_KEY, JSON.stringify(voteHistory));
+
+    // 重新生成排行榜
+    generateRankListHTML();
+
+    // 显示成功提示
+    const voteBtn = document.querySelector(`.vote-btn[data-province="${province}"]`);
+    if (voteBtn) {
+        voteBtn.textContent = '已投';
+        voteBtn.disabled = true;
     }
 }
 
@@ -1167,8 +1258,10 @@ function showRankPanel() {
                 // 更新描述
                 if (type === 'province') {
                     rankDesc.textContent = '统计各省份已制作地区数占总地区数的比例（不含直辖市）';
-                } else {
+                } else if (type === 'region') {
                     rankDesc.textContent = '统计各地区已制作地区数占总地区数的比例';
+                } else if (type === 'expected') {
+                    rankDesc.textContent = '投出你最期待的下一个视频地区（每个终端每10分钟可投1票）';
                 }
 
                 // 重新生成排行榜并重置滚动条
@@ -1178,6 +1271,14 @@ function showRankPanel() {
                     rankListEl.scrollTop = 0;
                 }
             });
+        });
+
+        // 添加投票按钮事件
+        rankPanel.addEventListener('click', function(e) {
+            if (e.target.classList.contains('vote-btn')) {
+                const province = e.target.dataset.province;
+                handleVote(province);
+            }
         });
     }
 }
