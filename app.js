@@ -215,7 +215,8 @@ function initMap(mapName = 'china') {
                 type: 'map',
                 map: mapName,
                 roam: false,
-                zoom: mapName === 'china' ? 1.2 : 1.3,
+                zoom: mapName === 'china' ? 1.2 : mapName === 'hainan' ? 3.5 : 1.3,
+                center: mapName === 'hainan' ? [109.9, 19.2] : undefined,
                 emphasis: {
                     label: {
                         show: true,
