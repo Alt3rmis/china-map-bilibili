@@ -51,16 +51,24 @@ header h1 {
     flex-wrap: wrap;
 }
 
-.rank-btn {
+/* 通用按钮样式 */
+.rank-btn, .bilibili-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 10px 20px;
-    background: linear-gradient(135deg, #48dbfb, #0abde3);
-    color: white;
     border: none;
     border-radius: 25px;
     font-size: 0.95rem;
     font-weight: 600;
+    color: white;
+    text-decoration: none;
     cursor: pointer;
     transition: all 0.3s;
+}
+
+.rank-btn {
+    background: linear-gradient(135deg, #48dbfb, #0abde3);
     box-shadow: 0 4px 15px rgba(72, 219, 251, 0.3);
 }
 
@@ -71,22 +79,15 @@ header h1 {
 }
 
 .bilibili-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 15px;
-    padding: 10px 20px;
     background: linear-gradient(135deg, #fb7299, #ff85a2);
-    color: white;
-    text-decoration: none;
-    border-radius: 25px;
-    font-weight: bold;
-    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 15px rgba(251, 114, 153, 0.3);
+    gap: 8px;
 }
 
 .bilibili-link:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(251, 114, 153, 0.4);
+    box-shadow: 0 6px 20px rgba(251, 114, 153, 0.4);
+    background: linear-gradient(135deg, #ff85a2, #fb7299);
 }
 
 .bili-icon {
