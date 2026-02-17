@@ -1153,8 +1153,12 @@ function showRankPanel() {
                     rankDesc.textContent = '统计各地区已制作地区数占总地区数的比例';
                 }
 
-                // 重新生成排行榜
+                // 重新生成排行榜并重置滚动条
                 generateRankListHTML();
+                const rankListEl = document.getElementById('rank-list');
+                if (rankListEl) {
+                    rankListEl.scrollTop = 0;
+                }
             });
         });
     }

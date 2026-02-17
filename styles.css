@@ -4,6 +4,11 @@
     box-sizing: border-box;
 }
 
+html {
+    background: #0f3460;
+    min-height: 100%;
+}
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
         'Microsoft YaHei', sans-serif;
@@ -16,7 +21,7 @@ body {
     max-width: 1400px;
     margin: 0 auto;
     padding: 20px;
-    min-height: 100vh;
+    min-height: auto;
     display: flex;
     flex-direction: column;
 }
@@ -345,11 +350,13 @@ footer {
     padding: 40px;
     max-width: 600px;
     width: 90%;
-    max-height: 80vh;
-    overflow-y: auto;
+    max-height: 85vh;
+    overflow: hidden;
     position: relative;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(72, 219, 251, 0.3);
+    display: flex;
+    flex-direction: column;
 }
 
 .rank-close-btn {
@@ -380,6 +387,7 @@ footer {
     margin-bottom: 10px;
     color: #48dbfb;
     text-align: center;
+    flex-shrink: 0;
 }
 
 .rank-desc {
@@ -387,9 +395,16 @@ footer {
     color: #a0a0a0;
     margin-bottom: 25px;
     font-size: 0.9rem;
+    flex-shrink: 0;
 }
 
 /* 切换按钮 */
+.rank-toggle-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-shrink: 0;
+}
 .rank-toggle-buttons {
     display: flex;
     gap: 10px;
@@ -425,9 +440,10 @@ footer {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    max-height: 60vh;
+    flex: 1;
     overflow-y: auto;
     padding-right: 8px;
+    min-height: 0;
 
     /* 自定义滚动条样式 */
     scrollbar-width: thin;
