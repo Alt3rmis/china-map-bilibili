@@ -389,10 +389,69 @@ footer {
     font-size: 0.9rem;
 }
 
+/* 切换按钮 */
+.rank-toggle-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.rank-toggle-btn {
+    flex: 1;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #a0a0a0;
+    border: 1px solid rgba(72, 219, 251, 0.3);
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.rank-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(72, 219, 251, 0.5);
+}
+
+.rank-toggle-btn.active {
+    background: linear-gradient(135deg, #48dbfb, #0abde3);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(72, 219, 251, 0.3);
+}
+
 .rank-list {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 8px;
+
+    /* 自定义滚动条样式 */
+    scrollbar-width: thin;
+    scrollbar-color: #48dbfb rgba(255, 255, 255, 0.1);
+}
+
+/* WebKit 滚动条样式 */
+.rank-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.rank-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.rank-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #48dbfb, #0abde3);
+    border-radius: 4px;
+    border: 2px solid rgba(255, 255, 255, 0.05);
+}
+
+.rank-list::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #0abde3, #48dbfb);
 }
 
 .rank-item {
@@ -484,6 +543,52 @@ footer {
 
 .rank-item {
     position: relative;
+}
+
+/* 地区排行样式 */
+.rank-rank-item {
+    align-items: flex-start;
+}
+
+.rank-content-wrapper {
+    flex: 1;
+    min-width: 0;
+}
+
+.rank-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    gap: 10px;
+}
+
+.region-provinces {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.region-province-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    border: 1px solid rgba(72, 219, 251, 0.2);
+}
+
+.region-province-name {
+    color: #fff;
+    font-weight: 500;
+}
+
+.region-province-stats {
+    color: #48dbfb;
+    font-weight: 600;
 }
 
 /* 响应式设计 */

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>快递里的中国 - 城市地图</title>
-    <link rel="stylesheet" href="styles.css?v=4">
+    <link rel="stylesheet" href="styles.css?v=6">
 </head>
 <body>
     <div class="container">
@@ -56,7 +56,14 @@
             <div class="rank-content">
                 <button class="rank-close-btn" id="rank-close-btn">&times;</button>
                 <h2>📊 省份覆盖率排行</h2>
-                <p class="rank-desc">统计各省份已制作地区数占总地区数的比例（不含直辖市）</p>
+
+                <!-- 切换按钮 -->
+                <div class="rank-toggle-buttons">
+                    <button class="rank-toggle-btn active" data-type="province">按省份</button>
+                    <button class="rank-toggle-btn" data-type="region">按地区</button>
+                </div>
+
+                <p class="rank-desc" id="rank-desc">统计各省份已制作地区数占总地区数的比例（不含直辖市）</p>
                 <div id="rank-list" class="rank-list"></div>
             </div>
         </div>
