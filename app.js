@@ -27,13 +27,64 @@ function isDevMode() {
     return false;
 }
 
+// 检查调试面板是否已关闭
+function isDebugPanelClosed() {
+    return localStorage.getItem('debugPanelClosed') === 'true';
+}
+
+// 切换调试面板显示/隐藏
+function toggleDebugPanel() {
+    const debugPanel = document.getElementById('debug-panel');
+    const toggleBtn = document.getElementById('debug-toggle-btn');
+    const isClosed = debugPanel.style.display === 'none';
+
+    if (isClosed) {
+        debugPanel.style.display = 'block';
+        toggleBtn.style.display = 'none';
+        localStorage.setItem('debugPanelClosed', 'false');
+    } else {
+        debugPanel.style.display = 'none';
+        toggleBtn.style.display = 'block';
+        localStorage.setItem('debugPanelClosed', 'true');
+    }
+}
+
+// 创建重新打开调试面板的按钮
+function createDebugToggleBtn() {
+    const toggleBtn = document.createElement('button');
+    toggleBtn.id = 'debug-toggle-btn';
+    toggleBtn.textContent = '🛠️ 调试';
+    toggleBtn.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.8);
+        border: 1px solid #48dbfb;
+        color: #48dbfb;
+        padding: 8px 12px;
+        cursor: pointer;
+        border-radius: 4px;
+        z-index: 9999;
+        font-size: 12px;
+        display: none;
+    `;
+    toggleBtn.addEventListener('click', toggleDebugPanel);
+    document.body.appendChild(toggleBtn);
+    return toggleBtn;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     loadMapData();
     setupEventListeners();
 
-    // 如果是开发环境，创建调试面板
+    // 如果是开发环境，创建调试面板和切换按钮
     if (isDevMode()) {
-        createDebugPanel();
+        const toggleBtn = createDebugToggleBtn();
+        if (!isDebugPanelClosed()) {
+            createDebugPanel();
+        } else {
+            toggleBtn.style.display = 'block';
+        }
     }
 });
 
@@ -656,8 +707,9 @@ function createDebugPanel() {
     `;
 
     debugPanel.innerHTML = `
-        <div style="color: #48dbfb; font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #48dbfb; padding-bottom: 5px;">
-            🛠️ 海南地图调试面板
+        <div style="color: #48dbfb; font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #48dbfb; padding-bottom: 5px; display: flex; justify-content: space-between; align-items: center;">
+            <span>🛠️ 海南地图调试面板</span>
+            <button id="debug-close-btn" style="background: transparent; border: none; color: #48dbfb; font-size: 16px; cursor: pointer; padding: 0;">✕</button>
         </div>
         <div style="margin-bottom: 8px;">
             <span style="color: #feca57;">Zoom:</span>
@@ -700,6 +752,7 @@ function createDebugPanel() {
     document.body.appendChild(debugPanel);
 
     // 绑定按钮事件
+    document.getElementById('debug-close-btn').addEventListener('click', toggleDebugPanel);
     document.getElementById('debug-zoom-in').addEventListener('click', () => adjustZoom(0.1));
     document.getElementById('debug-zoom-out').addEventListener('click', () => adjustZoom(-0.1));
     document.getElementById('debug-reset').addEventListener('click', () => resetMap());
