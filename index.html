@@ -4,17 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>快递里的中国 - 城市地图</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
     <div class="container">
         <header>
             <h1>快递里的中国</h1>
             <p class="subtitle">老猫鱼不吃鱼 | 城市杂谈系列</p>
-            <a href="https://space.bilibili.com/238365787/lists/475111?type=season" target="_blank" class="bilibili-link">
-                <span class="bili-icon">B</span>
-                B站合集
-            </a>
+            <div class="header-buttons">
+                <button id="rank-btn" class="rank-btn">📊 省份覆盖率排行</button>
+                <a href="https://space.bilibili.com/238365787/lists/475111?type=season" target="_blank" class="bilibili-link">
+                    <span class="bili-icon">B</span>
+                    B站合集
+                </a>
+            </div>
         </header>
 
         <div class="main-content">
@@ -47,6 +50,16 @@
         <footer>
             <p>数据来源：哔哩哔哩UP主 老猫鱼不吃鱼</p>
         </footer>
+
+        <!-- 排行榜面板 -->
+        <div class="rank-panel" id="rank-panel" style="display: none;">
+            <div class="rank-content">
+                <button class="rank-close-btn" id="rank-close-btn">&times;</button>
+                <h2>📊 省份覆盖率排行</h2>
+                <p class="rank-desc">统计各省份已制作地区数占总地区数的比例（不含直辖市）</p>
+                <div id="rank-list" class="rank-list"></div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
