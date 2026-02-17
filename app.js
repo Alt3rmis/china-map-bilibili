@@ -790,7 +790,7 @@ function hideCityInfo() {
 // 显示投票界面
 function showVoteUI(cityName, cityNameEl, videoList, infoEmpty, infoContent) {
     console.log('showVoteUI called for:', cityName);
-    const canVote = checkCanVote(cityName);
+    const canVote = checkCanVote();
     const currentVotes = voteData[cityName]?.votes || 0;
 
     console.log('Vote info:', { canVote, currentVotes, cityName });
@@ -1318,15 +1318,15 @@ function generateRankListHTML() {
 }
 
 // 检查是否可以投票（10分钟内是否已投过）
-function checkCanVote(province) {
+function checkCanVote() {
     const voteHistory = JSON.parse(localStorage.getItem(VOTE_STORAGE_KEY) || '{}');
-    const lastVote = voteHistory[province];
+    const lastVote = voteHistory.lastVote;
 
     if (!lastVote) {
         return true;
     }
 
-    const lastVoteTime = new Date(lastVote.timestamp);
+    const lastVoteTime = new Date(lastVote);
     const now = new Date();
     const minutesDiff = (now - lastVoteTime) / (1000 * 60);
 
@@ -1335,7 +1335,7 @@ function checkCanVote(province) {
 
 // 处理投票事件
 function handleVote(province) {
-    if (!checkCanVote(province)) {
+    if (!checkCanVote()) {
         alert('您在 10 分钟内已经投过票了，请稍后再试');
         return;
     }
@@ -1346,11 +1346,9 @@ function handleVote(province) {
     }
     voteData[province].votes += 1;
 
-    // 记录投票历史
+    // 记录全局最后投票时间
     const voteHistory = JSON.parse(localStorage.getItem(VOTE_STORAGE_KEY) || '{}');
-    voteHistory[province] = {
-        timestamp: new Date().toISOString()
-    };
+    voteHistory.lastVote = new Date().toISOString();
     localStorage.setItem(VOTE_STORAGE_KEY, JSON.stringify(voteHistory));
 }
 
@@ -1382,7 +1380,7 @@ function showRankPanel() {
                 } else if (type === 'region') {
                     rankDesc.textContent = '统计各地区已制作地区数占总地区数的比例';
                 } else if (type === 'expected') {
-                    rankDesc.textContent = '投出你最期待的下一个视频地区（每个终端每10分钟可投1票）';
+                    rankDesc.textContent = '投出你最期待的下一个视频地区（每10分钟可投1票）';
                 }
 
                 // 重新生成排行榜并重置滚动条
