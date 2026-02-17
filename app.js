@@ -88,6 +88,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// 窗口大小改变时调整地图大小
+window.addEventListener('resize', function() {
+    if (chart) {
+        chart.resize();
+    }
+});
+
 // 初始化时检查数据
 function checkData() {
     // data.js 通过 script 标签加载，检查全局变量
@@ -155,8 +162,12 @@ function getCitiesWithDataForMap(mapName) {
         if (window.provinceData) {
             return Object.keys(window.provinceData);
         }
-        // 回退到 cityData
-        return Object.keys(cityData).filter(key => !isCityKey(key));
+        // 回退到 cityData（如果存在）
+        if (typeof cityData !== 'undefined') {
+            return Object.keys(cityData).filter(key => !isCityKey(key));
+        }
+        // 都没有数据，返回空数组
+        return [];
     }
 
     // 省级地图：返回该省份有视频的城市
@@ -185,8 +196,8 @@ function getCitiesWithDataForMap(mapName) {
         // 去重
         provinceCities = [...new Set(provinceCities)].filter(Boolean);
     } else {
-        // 回退到 cityData
-        provinceCities = Object.keys(cityData).filter(key => isCityKey(key) && isInProvince(key, mapName));
+        // 省份不在 provinceData 中，返回空数组
+        provinceCities = [];
     }
 
     // 生成带后缀的城市名称别名（用于地图高亮）
@@ -439,24 +450,29 @@ function getVideosForProvince(provinceName) {
         return window.provinceData[provinceName].videos || [];
     }
 
-    // 回退到 cityData
-    const videos = [];
+    // 回退到 cityData（如果存在）
+    if (typeof cityData !== 'undefined') {
+        const videos = [];
 
-    // 遍历所有城市数据，找出属于该省份的城市
-    Object.keys(cityData).forEach(key => {
-        if (isCityKey(key) && isInProvince(key, provinceName)) {
-            const cityVideos = cityData[key].videos;
-            cityVideos.forEach(video => {
-                videos.push({
-                    ...video,
-                    city: key
+        // 遍历所有城市数据，找出属于该省份的城市
+        Object.keys(cityData).forEach(key => {
+            if (isCityKey(key) && isInProvince(key, provinceName)) {
+                const cityVideos = cityData[key].videos;
+                cityVideos.forEach(video => {
+                    videos.push({
+                        ...video,
+                        city: key
+                    });
                 });
-            });
-        }
-    });
+            }
+        });
 
-    // 按发布时间排序（最新的在前）
-    return videos.sort((a, b) => new Date(b.date) - new Date(a.date));
+        // 按发布时间排序（最新的在前）
+        return videos.sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+
+    // 都没有数据，返回空数组
+    return [];
 }
 
 // 加载省份地图
@@ -875,6 +891,7 @@ const provinceCityCount = {
     '青海': 8,  // 西宁、海东、海北、黄南、海南、果洛、玉树、海西
     '宁夏': 5,  // 银川、石嘴山、吴忠、固原、中卫
     '新疆': 14, // 乌鲁木齐、克拉玛依、吐鲁番、哈密、昌吉、博尔塔拉、巴音郭楞、阿克苏、克孜勒苏、喀什、和田、伊犁、塔城、阿勒泰
+    '台湾': 1, // 台湾（省级行政区）
 };
 
 // 计算省份已覆盖的地区数量
@@ -915,6 +932,7 @@ function getCoveredCitiesCount(provinceName) {
         '青海': ['西宁', '海东', '海北', '黄南', '海南', '果洛', '玉树', '海西'],
         '宁夏': ['银川', '石嘴山', '吴忠', '固原', '中卫'],
         '新疆': ['乌鲁木齐', '克拉玛依', '吐鲁番', '哈密', '昌吉', '博尔塔拉', '巴音郭楞', '阿克苏', '克孜勒苏', '喀什', '和田', '伊犁', '塔城', '阿勒泰'],
+        '台湾': ['台湾'],
     };
 
     const validCities = provinceCitiesMap[provinceName] || [];
@@ -994,7 +1012,7 @@ let currentRankView = 'province';
 const regionGroups = {
     '东北': ['辽宁', '吉林', '黑龙江'],
     '华北': ['北京', '天津', '河北', '山西', '内蒙古'],
-    '华东': ['上海', '江苏', '浙江', '安徽', '福建', '江西', '山东'],
+    '华东': ['上海', '江苏', '浙江', '安徽', '福建', '江西', '山东', '台湾'],
     '华南': ['广东', '广西', '海南'],
     '华中': ['河南', '湖北', '湖南'],
     '西南': ['重庆', '四川', '贵州', '云南', '西藏'],
