@@ -1,7 +1,7 @@
 // 城市数据配置（按省份组织）
 // 城市名称需要与 ECharts 地图数据匹配
 // 数据来源：哔哩哔哩UP主 老猫鱼不吃鱼
-// 最后更新时间: 2026-02-17T04:43:01.650Z
+// 最后更新时间: 2026-02-17T13:27:45.514Z
 //
 // 数据说明：
 // - city: 城市名称（优先使用 manualCity，否则使用 autoCities）
@@ -819,6 +819,30 @@ const provinceData = {
 
     "江苏": {
         videos: [
+        {
+                title: "徐州地邪在哪里？是怎么被山东坑了的？快递里的中国 江苏 徐州（2）",
+                url: "https://www.bilibili.com/video/BV1X61KBEEPY",
+                date: "2025-10-31",
+                aid: 115467343630959,
+                bvid: "",
+                views: 499445,
+                danmaku: 6883,
+                city: "徐州",
+                autoCities: ["徐州"],
+                manualCity: null
+            },
+        {
+                title: "徐州淘汰，建省失败。淮海省自身又是什么状态？快递里的中国 江苏 徐州 （1）",
+                url: "https://www.bilibili.com/video/BV1Dx4HzFEvR",
+                date: "2025-10-10",
+                aid: 115350373078822,
+                bvid: "",
+                views: 405740,
+                danmaku: 5933,
+                city: "徐州",
+                autoCities: ["徐州"],
+                manualCity: null
+            },
         {
                 title: "苏北人称呼是怎么来的，江苏最大城市为什么又称为北上海和苏北小韩国？快递里的中国 江苏 盐城",
                 url: "https://www.bilibili.com/video/BV1DV3Ez1E39",
