@@ -243,9 +243,9 @@ function initMap(mapName = 'china') {
                 name: '快递里的中国',
                 type: 'map',
                 map: mapName,
-                roam: isDevMode() && mapName === 'hainan' ? true : false,
-                zoom: mapName === 'china' ? 1.2 : mapName === 'hainan' ? 3.5 : 1.3,
-                center: mapName === 'hainan' ? [109.9, 19.2] : undefined,
+                roam: isDevMode() && mapName === '海南' ? true : false,
+                zoom: mapName === 'china' ? 1.2 : mapName === '海南' ? 3.5 : 1.3,
+                center: mapName === '海南' ? [109.9, 19.2] : undefined,
                 emphasis: {
                     label: {
                         show: true,
@@ -294,7 +294,7 @@ function initMap(mapName = 'china') {
     chart.setOption(option);
 
     // 如果是开发环境且是海南地图，添加 georoam 事件监听
-    if (isDevMode() && mapName === 'hainan') {
+    if (isDevMode() && mapName === '海南') {
         // 移除旧的监听器
         chart.off('georoam');
 
@@ -671,13 +671,29 @@ function createDebugPanel() {
             <span style="color: #feca57;">Code:</span>
             <span id="debug-code" style="color: #48dbfb; margin-left: 8px;">zoom: 3.5, center: [109.9, 19.2]</span>
         </div>
-        <div style="display: flex; gap: 8px;">
-            <button id="debug-zoom-in" style="flex: 1; background: #48dbfb; border: none; color: #000; padding: 6px; cursor: pointer; border-radius: 4px;">放大 +</button>
-            <button id="debug-zoom-out" style="flex: 1; background: #48dbfb; border: none; color: #000; padding: 6px; cursor: pointer; border-radius: 4px;">缩小 -</button>
+        <div style="margin-bottom: 8px;">
+            <span style="color: #feca57;">位置调整:</span>
+            <div style="display: flex; justify-content: center; gap: 5px; margin-top: 5px;">
+                <div></div>
+                <button id="debug-move-up" style="background: #48dbfb; border: none; color: #000; padding: 5px 10px; cursor: pointer; border-radius: 4px;">↑</button>
+                <div></div>
+            </div>
+            <div style="display: flex; justify-content: center; gap: 5px; margin-top: 5px;">
+                <button id="debug-move-left" style="background: #48dbfb; border: none; color: #000; padding: 5px 10px; cursor: pointer; border-radius: 4px;">←</button>
+                <button id="debug-move-down" style="background: #48dbfb; border: none; color: #000; padding: 5px 10px; cursor: pointer; border-radius: 4px;">↓</button>
+                <button id="debug-move-right" style="background: #48dbfb; border: none; color: #000; padding: 5px 10px; cursor: pointer; border-radius: 4px;">→</button>
+            </div>
         </div>
-        <button id="debug-reset" style="width: 100%; margin-top: 8px; background: #ff6b6b; border: none; color: #fff; padding: 6px; cursor: pointer; border-radius: 4px;">重置</button>
+        <div style="margin-bottom: 8px;">
+            <span style="color: #feca57;">缩放:</span>
+            <div style="display: flex; gap: 8px; margin-top: 5px;">
+                <button id="debug-zoom-in" style="flex: 1; background: #48dbfb; border: none; color: #000; padding: 6px; cursor: pointer; border-radius: 4px;">放大 +</button>
+                <button id="debug-zoom-out" style="flex: 1; background: #48dbfb; border: none; color: #000; padding: 6px; cursor: pointer; border-radius: 4px;">缩小 -</button>
+            </div>
+        </div>
+        <button id="debug-reset" style="width: 100%; background: #ff6b6b; border: none; color: #fff; padding: 8px; cursor: pointer; border-radius: 4px;">重置</button>
         <div style="margin-top: 10px; font-size: 11px; color: #888; line-height: 1.4;">
-            提示: 拖动和缩放地图，找到合适位置后，复制代码到 app.js 第 218-219 行
+            提示: 使用方向按钮调整位置，缩放调整大小，找到合适位置后，复制代码到 app.js 第 218-219 行
         </div>
     `;
 
@@ -687,6 +703,10 @@ function createDebugPanel() {
     document.getElementById('debug-zoom-in').addEventListener('click', () => adjustZoom(0.1));
     document.getElementById('debug-zoom-out').addEventListener('click', () => adjustZoom(-0.1));
     document.getElementById('debug-reset').addEventListener('click', () => resetMap());
+    document.getElementById('debug-move-up').addEventListener('click', () => moveMap(0, 0.5));
+    document.getElementById('debug-move-down').addEventListener('click', () => moveMap(0, -0.5));
+    document.getElementById('debug-move-left').addEventListener('click', () => moveMap(-0.5, 0));
+    document.getElementById('debug-move-right').addEventListener('click', () => moveMap(0.5, 0));
 }
 
 // 更新调试面板显示
@@ -723,6 +743,28 @@ function resetMap() {
         series: [{
             zoom: 3.5,
             center: [109.9, 19.2]
+        }]
+    });
+}
+
+// 移动地图
+function moveMap(deltaX, deltaY) {
+    if (!chart || currentMap !== '海南') return;
+
+    const option = chart.getOption();
+    const currentCenter = option.series[0].center;
+    const currentZoom = option.series[0].zoom;
+
+    // 根据缩放级别调整移动距离（缩放越大，移动距离越小）
+    const moveScale = 1 / currentZoom;
+    const newCenter = [
+        currentCenter[0] + deltaX * moveScale,
+        currentCenter[1] + deltaY * moveScale
+    ];
+
+    chart.setOption({
+        series: [{
+            center: newCenter
         }]
     });
 }
