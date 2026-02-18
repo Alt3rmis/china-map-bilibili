@@ -49,7 +49,7 @@ cat /etc/nginx/conf.d/*.conf
 
 ```bash
 # 1. SSH 登录到服务器
-ssh user@47.116.182.49
+ssh user@your-server-ip.com
 
 # 2. 进入项目目录
 cd /var/www/china-map-bilibili  # 或您的部署路径
@@ -214,7 +214,7 @@ curl http://localhost:3000/api/votes
 
 ```bash
 # 在本地电脑上执行
-curl http://47.116.182.49:3000/api/votes
+curl http://your-server-ip.com:3000/api/votes
 ```
 
 ## 查看日志

@@ -2,7 +2,7 @@
 
 ## 问题说明
 
-访问 `http://47.116.182.49/` 时 `/api/votes` 返回 404（或 404），但服务器内部访问正常。
+访问 `http://your-server-ip.com/` 时 `/api/votes` 返回 404（或 404），但服务器内部访问正常。
 
 **原因：** Nginx 配置了反向代理但没有正确配置 `/api` 路径。
 
@@ -67,7 +67,7 @@ sudo nginx -s reload
 
 ```bash
 # 测试外部访问
-curl http://47.116.182.49/api/votes
+curl http://your-server-ip.com/api/votes
 ```
 
 应该返回 JSON 数据：
@@ -86,7 +86,7 @@ curl http://47.116.182.49/api/votes
 
 **特定域名配置：**
 ```
-/etc/nginx/sites-available/47.116.182.49
+/etc/nginx/sites-available/your-server-ip.com
 /etc/nginx/sites-available/your-domain.com
 ```
 
@@ -110,7 +110,7 @@ curl http://47.116.182.49/api/votes
 ```nginx
 server {
     listen 80;
-    server_name 47.116.182.49;
+    server_name your-server-ip.com;
 
     location / {
         root /var/www/china-map-bilibili;
@@ -136,7 +136,7 @@ server {
 http {
     server {
         listen 80;
-        server_name 47.116.182.49;
+        server_name your-server-ip.com;
 
         location / {
             root /var/www/china-map-bilibili;
@@ -160,7 +160,7 @@ http {
 ```nginx
 server {
     listen 443 ssl http2;
-    server_name 47.116.182.49;
+    server_name your-server-ip.com;
 
     ssl_certificate /path/to/cert.pem;
     ssl_certificate_key /path/to/key.pem;
@@ -211,8 +211,8 @@ server {
 - [ ] 在配置文件中添加 `location /api/` 块
 - [ ] 运行 `sudo nginx -t` 测试配置
 - [ ] 运行 `sudo nginx -s reload` 重载配置
-- [ ] 外部访问 `http://47.116.182.49/api/votes` 返回数据
-- [ ] 网站地图 `http://47.116.182.49` 正常访问
+- [ ] 外部访问 `http://your-server-ip.com/api/votes` 返回数据
+- [ ] 网站地图 `http://your-server-ip.com` 正常访问
 
 ## 故障排除
 
