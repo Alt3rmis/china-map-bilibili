@@ -366,7 +366,8 @@ china-map-bilibili/
 │   └── README.md              # 脚本说明文档
 ├── docs/                        # 文档
 │   ├── DEPLOY.md              # 自动部署配置指南
-│   └── TROUBLESHOOTING.md    # 故障排除指南
+│   ├── TROUBLESHOOTING.md    # 故障排除指南
+│   └── NGINX-CONFIG.md       # Nginx 反向代理配置指南
 └── data/                        # 数据文件夹
     ├── raw_data.js             # 原始数据（从 B站控制台粘贴）
     ├── data.js                 # 最终数据配置（provinceData 格式）

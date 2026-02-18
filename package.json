@@ -7,7 +7,8 @@
     "process-data": "node scripts/process-raw-data.js",
     "start": "node server.js",
     "dev": "node server.js",
-    "check-deploy": "node scripts/check-deploy.js"
+    "check-deploy": "node scripts/check-deploy.js",
+    "find-nginx": "bash scripts/find-nginx-config.sh"
   },
   "dependencies": {
     "express": "^4.18.2"

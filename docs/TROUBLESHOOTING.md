@@ -2,7 +2,46 @@
 
 ## 常见问题
 
-### 1. 404 Not Found - GET /api/votes
+### 1. 404 Not Found - GET /api/votes（外部访问返回 404）
+
+**原因：** Nginx 没有配置 `/api` 路径的反向代理
+
+**解决方法：**
+
+#### 方式一：使用配置查找脚本
+
+```bash
+npm run find-nginx
+```
+
+根据输出的位置，编辑对应的配置文件，添加：
+
+```nginx
+location /api/ {
+    proxy_pass http://localhost:3000/api/;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_cache_bypass $http_upgrade;
+}
+```
+
+**注意：** 添加到包含 `location /` 的 server 块中。
+
+#### 方式二：手动查找配置
+
+```bash
+# 查找所有配置文件
+find /etc/nginx -name '*.conf'
+
+# 查看内容（例如）
+cat /etc/nginx/sites-available/default
+cat /etc/nginx/nginx.conf
+cat /etc/nginx/conf.d/*.conf
+```
+
+### 2. 404 Not Found - GET /api/votes
 
 **原因：** Express 服务器没有运行
 
