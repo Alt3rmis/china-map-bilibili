@@ -1,24 +1,16 @@
+// 投票路由模块
+
 const express = require('express');
 const fs = require('fs').promises;
 const path = require('path');
 
-const app = express();
-const PORT = process.env.PORT || 3000;
-const VOTES_FILE = path.join(__dirname, 'data', 'vote-data.json');
+const router = express.Router();
+const VOTES_FILE = path.join(__dirname, '..', '..', '..', 'data', 'vote-data.json');
 
-// 中间件
-app.use(express.json());
-app.use(express.static(__dirname));
-
-// CORS 支持
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
-    next();
-});
-
-// 读取投票数据
+/**
+ * 读取投票数据
+ * @returns {Object} 投票数据
+ */
 async function readVotes() {
     try {
         const data = await fs.readFile(VOTES_FILE, 'utf8');
@@ -29,14 +21,19 @@ async function readVotes() {
     }
 }
 
-// 写入投票数据
+/**
+ * 写入投票数据
+ * @param {Object} votes - 投票数据
+ */
 async function writeVotes(votes) {
     await fs.mkdir(path.dirname(VOTES_FILE), { recursive: true });
     await fs.writeFile(VOTES_FILE, JSON.stringify(votes, null, 2), 'utf8');
 }
 
-// API: 获取投票数据
-app.get('/api/votes', async (req, res) => {
+/**
+ * API: 获取投票数据
+ */
+router.get('/votes', async (req, res) => {
     try {
         const votes = await readVotes();
         res.json(votes);
@@ -46,8 +43,10 @@ app.get('/api/votes', async (req, res) => {
     }
 });
 
-// API: 提交投票
-app.post('/api/vote', async (req, res) => {
+/**
+ * API: 提交投票
+ */
+router.post('/vote', async (req, res) => {
     try {
         const { province } = req.body;
 
@@ -77,7 +76,4 @@ app.post('/api/vote', async (req, res) => {
     }
 });
 
-// 启动服务器
-app.listen(PORT, () => {
-    console.log(`服务器运行在 http://localhost:${PORT}`);
-});
+module.exports = router;

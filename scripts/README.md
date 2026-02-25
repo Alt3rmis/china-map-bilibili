@@ -1,9 +1,11 @@
-# 数据获取脚本使用说明
+# 脚本使用说明
 
-## 方式一：Node.js 脚本（推荐）
+## 数据处理脚本
+
+### 方式一：Node.js 脚本（推荐）
 
 ```bash
-node scripts/fetch-data.js
+node scripts/data/fetch-data.js
 ```
 
 **优点：**
@@ -15,12 +17,12 @@ node scripts/fetch-data.js
 **注意事项：**
 - B站 API 可能需要登录态，如果脚本返回错误，请使用方式二
 
-## 方式二：浏览器脚本（备用）
+### 方式二：浏览器脚本（备用）
 
 1. 在浏览器中登录 B站（bilibili.com）
 2. 打开合集页面：https://space.bilibili.com/238365787/lists/475111
 3. 按 F12 打开开发者工具
-4. 复制 `scripts/fetch-bilibili-data.js` 的内容到控制台
+4. 复制 `scripts/data/fetch-bilibili-data.js` 的内容到控制台
 5. 等待数据获取完成
 6. 复制输出的 data.js 格式代码
 7. 粘贴到 data/data.js 文件中
@@ -114,6 +116,32 @@ const cityData = {
         ]
     }
 };
+```
+
+## 部署脚本
+
+### 检查部署状态
+
+```bash
+node scripts/deploy/check-deploy.js
+```
+
+### 查找 Nginx 配置
+
+```bash
+bash scripts/deploy/find-nginx-config.sh
+```
+
+### 自动部署
+
+```bash
+bash scripts/deploy/deploy.sh
+```
+
+### 手动部署
+
+```bash
+bash scripts/deploy/manual-deploy.sh
 ```
 
 ## 更新数据后的操作
