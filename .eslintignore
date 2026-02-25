@@ -1,0 +1,4 @@
+node_modules/
+data/raw_data.js
+data/data.js
+scripts/data/

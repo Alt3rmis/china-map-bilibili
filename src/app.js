@@ -4,10 +4,7 @@ import { loadMapData, backToChina } from './services/mapService.js';
 import { loadVotesFromServer, confirmVote, initVoteService, setRankView, generateRankListHTML } from './services/voteService.js';
 import { showVoteConfirmDialog, hideVoteConfirmDialog, showRankPanel, hideRankPanel, hideCityInfo } from './services/uiService.js';
 import { isDevMode, createDebugToggleBtn, createDebugPanel, isDebugPanelClosed } from './utils/debugUtils.js';
-import { checkData } from './utils/dataUtils.js';
 import { getChart } from './utils/state.js';
-
-const dataMode = checkData();
 
 /**
  * 设置事件监听器
@@ -31,7 +28,7 @@ function setupEventListeners() {
 
     const rankPanel = document.getElementById('rank-panel');
     if (rankPanel) {
-        rankPanel.addEventListener('click', function(e) {
+        rankPanel.addEventListener('click', (e) => {
             if (e.target === rankPanel) {
                 hideRankPanel();
             }
@@ -39,23 +36,21 @@ function setupEventListeners() {
     }
 
     const rankToggleBtns = document.querySelectorAll('.rank-toggle-btn');
-    if (rankToggleBtns.length > 0) {
-        rankToggleBtns.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                const type = this.dataset.type;
-                if (type) {
-                    document.querySelectorAll('.rank-toggle-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    setRankView(type);
-                    generateRankListHTML();
-                }
-            });
+    rankToggleBtns.forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+            const type = e.currentTarget.dataset.type;
+            if (type) {
+                document.querySelectorAll('.rank-toggle-btn').forEach((b) => b.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                setRankView(type);
+                generateRankListHTML();
+            }
         });
-    }
+    });
 
     const videoList = document.getElementById('video-list');
     if (videoList) {
-        videoList.addEventListener('click', function(e) {
+        videoList.addEventListener('click', (e) => {
             const voteBtn = e.target.closest('.vote-ui-btn');
             if (voteBtn && !voteBtn.classList.contains('disabled')) {
                 const cityName = voteBtn.dataset.city;
@@ -77,7 +72,7 @@ function setupEventListeners() {
     }
 
     if (voteConfirmModal) {
-        voteConfirmModal.addEventListener('click', function(e) {
+        voteConfirmModal.addEventListener('click', (e) => {
             if (e.target === voteConfirmModal) {
                 hideVoteConfirmDialog();
             }
@@ -85,14 +80,14 @@ function setupEventListeners() {
     }
 }
 
-window.addEventListener('resize', function() {
+window.addEventListener('resize', () => {
     const chart = getChart();
     if (chart) {
         chart.resize();
     }
 });
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
     initVoteService();
     loadMapData();
     setupEventListeners();

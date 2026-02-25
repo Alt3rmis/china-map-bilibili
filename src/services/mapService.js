@@ -59,6 +59,7 @@ async function loadMapData() {
         initMap();
     } catch (error) {
         console.error('加载地图数据失败:', error);
+        // eslint-disable-next-line no-alert
         alert('加载地图数据失败，请检查网络连接');
     } finally {
         hideLoading();
@@ -87,15 +88,14 @@ function initMap(mapName = 'china') {
         },
         tooltip: {
             trigger: 'item',
-            formatter: function(params) {
+            formatter: (params) => {
                 if (params.name && citiesWithData.includes(params.name)) {
                     let displayName = params.name;
                     displayName = displayName.replace(/市$/, '');
                     displayName = displayName.replace(/区|地区$/, '');
                     return `<span style="color: #48dbfb; font-weight: bold;">${displayName}</span><br/>点击查看视频`;
-                } else {
-                    return params.name || (mapName === 'china' ? '中国' : mapName);
                 }
+                return params.name || (mapName === 'china' ? '中国' : mapName);
             },
             backgroundColor: 'rgba(0, 0, 0, 0.8)',
             borderColor: '#48dbfb',
@@ -119,7 +119,7 @@ function initMap(mapName = 'china') {
                 name: '快递里的中国',
                 type: 'map',
                 map: mapName,
-                roam: isDevMode() && mapName === '海南' ? true : false,
+                roam: isDevMode() && mapName === '海南',
                 zoom: mapName === 'china' ? 1.2 : mapName === '海南' ? 3.5 : 1.3,
                 center: mapName === '海南' ? [109.9, 19.2] : undefined,
                 emphasis: {
@@ -153,7 +153,7 @@ function initMap(mapName = 'china') {
         ]
     };
 
-    citiesWithData.forEach(city => {
+    citiesWithData.forEach((city) => {
         option.series[0].data.push({
             name: city,
             value: 1,
@@ -170,10 +170,10 @@ function initMap(mapName = 'china') {
 
     if (isDevMode() && mapName === '海南') {
         chart.off('georoam');
-        chart.on('georoam', function(params) {
-            const option = chart.getOption();
-            const currentZoom = option.series[0].zoom;
-            const currentCenter = option.series[0].center;
+        chart.on('georoam', () => {
+            const chartOption = chart.getOption();
+            const currentZoom = chartOption.series[0].zoom;
+            const currentCenter = chartOption.series[0].center;
             updateDebugPanel(currentZoom, currentCenter);
         });
 
@@ -185,7 +185,7 @@ function initMap(mapName = 'china') {
     backBtn.style.display = mapName === 'china' ? 'none' : 'flex';
 
     chart.off('click');
-    chart.on('click', function(params) {
+    chart.on('click', (params) => {
         console.log('Map clicked:', { mapName, paramsName: params.name });
 
         if (isLoading) {
@@ -198,10 +198,8 @@ function initMap(mapName = 'china') {
             } else if (params.name) {
                 showCityInfo(params.name);
             }
-        } else {
-            if (params.name) {
-                showCityInfo(params.name);
-            }
+        } else if (params.name) {
+            showCityInfo(params.name);
         }
     });
 }
@@ -225,6 +223,7 @@ async function loadProvinceMap(provinceName) {
         showProvinceVideos(provinceName);
     } catch (error) {
         console.error('加载省份地图失败:', error);
+        // eslint-disable-next-line no-alert
         alert('加载省份地图失败，请检查网络连接');
     } finally {
         hideLoading();
@@ -251,7 +250,7 @@ function getCitiesWithDataForMap(mapName) {
             return Object.keys(window.provinceData);
         }
         if (typeof cityData !== 'undefined') {
-            return Object.keys(cityData).filter(key => !isCityKey(key));
+            return Object.keys(cityData).filter((key) => !isCityKey(key));
         }
         return [];
     }
@@ -261,12 +260,12 @@ function getCitiesWithDataForMap(mapName) {
     if (window.provinceData && window.provinceData[mapName]) {
         const videos = window.provinceData[mapName].videos || [];
 
-        videos.forEach(video => {
+        videos.forEach((video) => {
             if (video.city) {
                 provinceCities.push(video.city);
             }
             if (video.autoCities && Array.isArray(video.autoCities)) {
-                video.autoCities.forEach(city => {
+                video.autoCities.forEach((city) => {
                     if (city) {
                         provinceCities.push(city);
                     }
@@ -280,7 +279,7 @@ function getCitiesWithDataForMap(mapName) {
     }
 
     const allCityNames = [];
-    provinceCities.forEach(city => {
+    provinceCities.forEach((city) => {
         allCityNames.push(city);
         allCityNames.push(city + '市');
         if (!city.endsWith('州')) {

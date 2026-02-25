@@ -8,9 +8,14 @@
     "start": "node src/server/index.js",
     "dev": "node src/server/index.js",
     "check-deploy": "node scripts/deploy/check-deploy.js",
-    "find-nginx": "bash scripts/deploy/find-nginx-config.sh"
+    "find-nginx": "bash scripts/deploy/find-nginx-config.sh",
+    "lint": "eslint src/**/*.js",
+    "lint:fix": "eslint src/**/*.js --fix"
   },
   "dependencies": {
     "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0"
   }
 }

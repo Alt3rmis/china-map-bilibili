@@ -6,9 +6,7 @@ const VOTE_COOLDOWN_MINUTES = 10;
 const VOTE_STORAGE_KEY = 'voteHistory';
 const VOTE_API_URL = '/api/votes';
 
-let currentTerminalId = null;
-
-let voteData = {};
+const voteData = {};
 
 let currentRankView = 'province';
 
@@ -69,14 +67,15 @@ async function loadVotesFromServer() {
     try {
         const response = await fetch(VOTE_API_URL);
         if (response.ok) {
-            voteData = await response.json();
+            const data = await response.json();
+            Object.assign(voteData, data);
             console.log('✓ 投票数据已加载:', voteData);
         }
     } catch (error) {
         console.error('加载投票数据失败:', error);
         const localVotes = localStorage.getItem('localVoteData');
         if (localVotes) {
-            voteData = JSON.parse(localVotes);
+            Object.assign(voteData, JSON.parse(localVotes));
             console.log('✓ 使用本地缓存的投票数据');
         }
     }
@@ -91,9 +90,9 @@ function checkCanVote() {
     if (voteHistory) {
         const history = JSON.parse(voteHistory);
         const lastVoteTime = history.lastVoteTime;
-        const now = new Date().getTime();
+        const now = Date.now();
         const cooldownMs = VOTE_COOLDOWN_MINUTES * 60 * 1000;
-        
+
         if (now - lastVoteTime < cooldownMs) {
             return false;
         }
@@ -107,6 +106,7 @@ function checkCanVote() {
  */
 async function handleVote(cityName) {
     if (!checkCanVote()) {
+        // eslint-disable-next-line no-alert
         alert('投票过于频繁，请稍后再试');
         return;
     }
@@ -123,26 +123,29 @@ async function handleVote(cityName) {
         if (response.ok) {
             const result = await response.json();
             console.log('投票成功:', result);
-            
+
             if (!voteData[cityName]) {
                 voteData[cityName] = { votes: 0, description: '' };
             }
             voteData[cityName].votes = result.votes;
-            
+
             const voteHistory = {
-                lastVoteTime: new Date().getTime()
+                lastVoteTime: Date.now()
             };
             localStorage.setItem(VOTE_STORAGE_KEY, JSON.stringify(voteHistory));
-            
+
             localStorage.setItem('localVoteData', JSON.stringify(voteData));
-            
+
+            // eslint-disable-next-line no-alert
             alert('投票成功！');
         } else {
             console.error('投票失败:', response.status);
+            // eslint-disable-next-line no-alert
             alert('投票失败，请稍后再试');
         }
     } catch (error) {
         console.error('投票请求失败:', error);
+        // eslint-disable-next-line no-alert
         alert('网络错误，请稍后再试');
     }
 }
@@ -154,7 +157,9 @@ async function confirmVote() {
     const modal = document.getElementById('vote-confirm-modal');
     const cityName = modal?.dataset.city;
 
-    if (!cityName) return;
+    if (!cityName) {
+        return;
+    }
 
     await handleVote(cityName);
 
@@ -221,22 +226,22 @@ function getCoveredCitiesCount(provinceName) {
 
     const validCities = provinceCitiesMap[provinceName] || [];
 
-    videos.forEach(video => {
+    videos.forEach((video) => {
         const citiesToAdd = [];
 
         if (video.city) {
             citiesToAdd.push(video.city);
         }
         if (video.autoCities && Array.isArray(video.autoCities)) {
-            video.autoCities.forEach(city => {
+            video.autoCities.forEach((city) => {
                 if (city) {
                     citiesToAdd.push(city);
                 }
             });
         }
 
-        citiesToAdd.forEach(cityName => {
-            let normalizedName = cityName.replace(/市$/, '');
+        citiesToAdd.forEach((cityName) => {
+            const normalizedName = cityName.replace(/市$/, '');
             if (validCities.includes(normalizedName)) {
                 coveredCities.add(normalizedName);
             }
@@ -292,7 +297,7 @@ function calculateRegionCoverage() {
         let regionCoveredCount = 0;
         const provinceDetails = [];
 
-        provinces.forEach(provinceName => {
+        provinces.forEach((provinceName) => {
             const totalCount = provinceCityCount[provinceName];
             if (!totalCount) {
                 return;
@@ -335,13 +340,15 @@ function generateRankListHTML() {
     const rankListEl = document.getElementById('rank-list');
     const rankDescEl = document.getElementById('rank-desc');
 
-    if (!rankListEl) return;
+    if (!rankListEl) {
+        return;
+    }
 
     if (currentRankView === 'province') {
         if (rankDescEl) {
             rankDescEl.textContent = '统计各省份已制作地区数占总地区数的比例（不含直辖市）';
         }
-        
+
         const results = calculateProvinceCoverage();
 
         if (results.length === 0) {
@@ -370,7 +377,7 @@ function generateRankListHTML() {
         if (rankDescEl) {
             rankDescEl.textContent = '统计各地区（华北、华东等）已制作地区数占总地区数的比例';
         }
-        
+
         const results = calculateRegionCoverage();
 
         if (results.length === 0) {
@@ -383,7 +390,7 @@ function generateRankListHTML() {
             const rankClass = rank <= 3 ? `rank-${rank}` : '';
             const coveragePercent = item.coverage.toFixed(1);
 
-            const provinceDetailsHTML = item.provinces.map(p => `
+            const provinceDetailsHTML = item.provinces.map((p) => `
                 <div class="region-province-item">
                     <span class="region-province-name">${p.province}</span>
                     <span class="region-province-stats">${p.coverage.toFixed(1)}%</span>
@@ -411,7 +418,7 @@ function generateRankListHTML() {
         if (rankDescEl) {
             rankDescEl.textContent = '用户最期待UP主更新的地区排名（点击地图上未覆盖区域可投票）';
         }
-        
+
         const results = calculateExpectedRank();
 
         if (results.length === 0) {

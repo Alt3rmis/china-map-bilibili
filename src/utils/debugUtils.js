@@ -166,9 +166,15 @@ function updateDebugPanel(zoom, center) {
     const centerEl = document.getElementById('debug-center');
     const codeEl = document.getElementById('debug-code');
 
-    if (zoomEl) zoomEl.textContent = zoom.toFixed(2);
-    if (centerEl) centerEl.textContent = `[${center[0].toFixed(2)}, ${center[1].toFixed(2)}]`;
-    if (codeEl) codeEl.textContent = `zoom: ${zoom.toFixed(2)}, center: [${center[0].toFixed(2)}, ${center[1].toFixed(2)}]`;
+    if (zoomEl) {
+        zoomEl.textContent = zoom.toFixed(2);
+    }
+    if (centerEl) {
+        centerEl.textContent = `[${center[0].toFixed(2)}, ${center[1].toFixed(2)}]`;
+    }
+    if (codeEl) {
+        codeEl.textContent = `zoom: ${zoom.toFixed(2)}, center: [${center[0].toFixed(2)}, ${center[1].toFixed(2)}]`;
+    }
 }
 
 /**
@@ -178,7 +184,9 @@ function updateDebugPanel(zoom, center) {
 function adjustZoom(delta) {
     const chart = getChart();
     const currentMap = getCurrentMap();
-    if (!chart || currentMap !== '海南') return;
+    if (!chart || currentMap !== '海南') {
+        return;
+    }
 
     const option = chart.getOption();
     const currentZoom = option.series[0].zoom;
@@ -197,7 +205,9 @@ function adjustZoom(delta) {
 function resetMap() {
     const chart = getChart();
     const currentMap = getCurrentMap();
-    if (!chart || currentMap !== '海南') return;
+    if (!chart || currentMap !== '海南') {
+        return;
+    }
 
     chart.setOption({
         series: [{
@@ -215,7 +225,9 @@ function resetMap() {
 function moveMap(deltaX, deltaY) {
     const chart = getChart();
     const currentMap = getCurrentMap();
-    if (!chart || currentMap !== '海南') return;
+    if (!chart || currentMap !== '海南') {
+        return;
+    }
 
     const option = chart.getOption();
     const currentCenter = option.series[0].center;
