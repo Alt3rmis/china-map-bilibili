@@ -1,7 +1,7 @@
 // 主应用入口 - 初始化和协调各个模块
 
 import { loadMapData, backToChina } from './services/mapService.js';
-import { loadVotesFromServer, confirmVote, initVoteService } from './services/voteService.js';
+import { loadVotesFromServer, confirmVote, initVoteService, setRankView, generateRankListHTML } from './services/voteService.js';
 import { showVoteConfirmDialog, hideVoteConfirmDialog, showRankPanel, hideRankPanel, hideCityInfo } from './services/uiService.js';
 import { isDevMode, createDebugToggleBtn, createDebugPanel, isDebugPanelClosed } from './utils/debugUtils.js';
 import { checkData } from './utils/dataUtils.js';
@@ -35,6 +35,21 @@ function setupEventListeners() {
             if (e.target === rankPanel) {
                 hideRankPanel();
             }
+        });
+    }
+
+    const rankToggleBtns = document.querySelectorAll('.rank-toggle-btn');
+    if (rankToggleBtns.length > 0) {
+        rankToggleBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const type = this.dataset.type;
+                if (type) {
+                    document.querySelectorAll('.rank-toggle-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    setRankView(type);
+                    generateRankListHTML();
+                }
+            });
         });
     }
 

@@ -333,10 +333,15 @@ function calculateRegionCoverage() {
  */
 function generateRankListHTML() {
     const rankListEl = document.getElementById('rank-list');
+    const rankDescEl = document.getElementById('rank-desc');
 
     if (!rankListEl) return;
 
     if (currentRankView === 'province') {
+        if (rankDescEl) {
+            rankDescEl.textContent = '统计各省份已制作地区数占总地区数的比例（不含直辖市）';
+        }
+        
         const results = calculateProvinceCoverage();
 
         if (results.length === 0) {
@@ -362,6 +367,10 @@ function generateRankListHTML() {
             `;
         }).join('');
     } else if (currentRankView === 'region') {
+        if (rankDescEl) {
+            rankDescEl.textContent = '统计各地区（华北、华东等）已制作地区数占总地区数的比例';
+        }
+        
         const results = calculateRegionCoverage();
 
         if (results.length === 0) {
@@ -399,7 +408,65 @@ function generateRankListHTML() {
             `;
         }).join('');
     } else if (currentRankView === 'expected') {
+        if (rankDescEl) {
+            rankDescEl.textContent = '用户最期待UP主更新的地区排名（点击地图上未覆盖区域可投票）';
+        }
+        
+        const results = calculateExpectedRank();
+
+        if (results.length === 0) {
+            rankListEl.innerHTML = '<p style="text-align: center; color: #a0a0a0;">暂无投票数据，快去点击地图上未覆盖的地区投票吧！</p>';
+            return;
+        }
+
+        rankListEl.innerHTML = results.map((item, index) => {
+            const rank = index + 1;
+            const rankClass = rank <= 3 ? `rank-${rank}` : '';
+            const maxVotes = results[0].votes || 1;
+            const percentage = (item.votes / maxVotes) * 100;
+
+            return `
+                <div class="rank-item ${rankClass}">
+                    <div class="rank-number">${rank}</div>
+                    <div class="rank-name">${item.city}</div>
+                    <div class="rank-stats">
+                        <span class="rank-coverage">${item.votes} 票</span>
+                    </div>
+                    <div class="rank-bar-bg" style="width: ${percentage}%"></div>
+                </div>
+            `;
+        }).join('');
     }
+}
+
+/**
+ * 计算最期待榜（按投票数排序）
+ * @returns {Array} 最期待榜列表
+ */
+function calculateExpectedRank() {
+    const results = [];
+
+    for (const cityName in voteData) {
+        const cityData = voteData[cityName];
+        if (cityData && cityData.votes && cityData.votes > 0) {
+            results.push({
+                city: cityName,
+                votes: cityData.votes
+            });
+        }
+    }
+
+    results.sort((a, b) => b.votes - a.votes);
+
+    return results.slice(0, 20);
+}
+
+/**
+ * 设置当前排行榜视图类型
+ * @param {string} viewType - 视图类型: 'province', 'region', 'expected'
+ */
+function setRankView(viewType) {
+    currentRankView = viewType;
 }
 
 export {
@@ -410,5 +477,6 @@ export {
     generateRankListHTML,
     voteData,
     currentRankView,
+    setRankView,
     initVoteService
 };
