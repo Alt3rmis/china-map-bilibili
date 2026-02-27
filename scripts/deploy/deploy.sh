@@ -18,8 +18,16 @@ ssh "${SERVER_USER}@${SERVER_HOST}" << EOF
     echo "拉取最新代码..."
     git pull origin main
 
+    echo "安装依赖..."
+    npm install
+
+    echo "重启后端服务..."
+    pm2 restart china-map || pm2 start src/server/index.js --name china-map
+
     echo "部署完成!"
     echo "部署时间: \$(date)"
+    echo "PM2 状态:"
+    pm2 status
 EOF
 
 echo "======================================"

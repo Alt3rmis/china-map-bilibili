@@ -28,6 +28,6 @@ jobs:
             cd ${{ secrets.SERVER_PATH }}
             git pull origin main
             npm install
-            pm2 restart china-map || pm2 start server.js --name china-map
+            pm2 restart china-map || pm2 start src/server/index.js --name china-map
             echo 'Deployed at $(date)'
           ENDSSH
