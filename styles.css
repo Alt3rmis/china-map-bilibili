@@ -328,6 +328,16 @@ footer {
     color: #a0a0a0;
 }
 
+footer a {
+    color: #a0a0a0;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+footer a:hover {
+    color: #00a1d6;
+}
+
 /* 排行榜面板 */
 .rank-panel {
     position: fixed;
