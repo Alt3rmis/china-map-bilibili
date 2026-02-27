@@ -10,7 +10,7 @@
 //
 // 省份包含该省份下的所有城市视频
 
-const provinceData = {
+window.provinceData = {
     "上海": {
         videos: [
         {
